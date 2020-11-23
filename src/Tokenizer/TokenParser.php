@@ -31,6 +31,7 @@ class TokenParser
      * Get translate tags from $templateFile
      *
      * @param string $templateFile
+     *
      * @return TranslateTag[]
      */
     public function getTranslateTags($templateFile)
@@ -44,11 +45,12 @@ class TokenParser
      * Process tokens into TranslateTag objects
      *
      * @param array $tokens
+     *
      * @return TranslateTag[]
      */
     private function processTokens($tokens)
     {
-        $tags = array();
+        $tags  = [];
         $topen = null;
         foreach ($tokens as $i => $token) {
             $previous = $i > 0 ? $tokens[$i - 1] : null;
@@ -59,7 +61,21 @@ class TokenParser
                 && $previous instanceof Token\Text
             ) {
                 $tags[] = new TranslateTag($previous->text, $topen->arguments, $topen->line);
-                $topen = null;
+                $topen  = null;
+            }
+
+            // Laminas $this->translate()-detection incl. a optional context on position 4
+            // TODO: make this configurable based on Keywords like 'translate:1,4c'
+            if ($token instanceof Token\Tag && $token->name === 'private_print_expression' && !empty($token->parameter['value'])) {
+                if (preg_match('/translate\(/', $token->parameter['value'])) {
+                    if (preg_match('/translate\([\'\"](.*)[\'\"].*?[\'\"](.*)[\'\"]\)$/U', $token->parameter['value'], $matches)) {
+                        // translation-string + context
+                        $tags[] = new TranslateTag($matches[1], [[TranslateTag::CONTEXT => $matches[2]]], $token->line);
+                    } elseif (preg_match('/translate\([\'\"](.*)[\'\"]/U', $token->parameter['value'], $matches)) {
+                        // Fallback: only the translation-string
+                        $tags[] = new TranslateTag($matches[1], [], $token->line);
+                    }
+                }
             }
         }
 

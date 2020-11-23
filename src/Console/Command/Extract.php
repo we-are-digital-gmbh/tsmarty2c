@@ -58,7 +58,7 @@ EOT
     /**
      * @param InputInterface $input
      * @param OutputInterface $output
-     * @return int
+     * @return void
      * @throws FileNotReadableException
      * @throws FileNotWritableException
      * @throws InvalidArgumentException
@@ -92,6 +92,7 @@ EOT
         }
 
         $output->writeln('<info>Done</info>');
+
         return 0;
     }
 

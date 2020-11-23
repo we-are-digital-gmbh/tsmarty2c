@@ -25,10 +25,14 @@ class Tag
     /** @var string[] */
     public $arguments;
 
-    public function __construct($line, $name, $arguments)
+    /** @var string[] */
+    public $parameter;
+
+    public function __construct($line, $name, $arguments, $parameter)
     {
         $this->line = $line;
         $this->name = $name;
         $this->arguments = $arguments;
+        $this->parameter = $parameter;
     }
 }
