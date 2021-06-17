@@ -54,6 +54,7 @@ class TokenLoader extends PoInitSmarty
      */
     private function createEntry($tag, $refName)
     {
+        //file_put_contents('/tmp/tag.txt', print_r($tag, true) . $refName);
         $message = $tag->getMessage();
         if (!$message) {
             throw new InvalidArgumentException('Empty message');

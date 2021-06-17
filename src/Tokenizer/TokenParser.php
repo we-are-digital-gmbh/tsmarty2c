@@ -68,12 +68,24 @@ class TokenParser
             // TODO: make this configurable based on Keywords like 'translate:1,4c'
             if ($token instanceof Token\Tag && $token->name === 'private_print_expression' && !empty($token->parameter['value'])) {
                 if (preg_match('/translate\(/', $token->parameter['value'])) {
-                    if (preg_match('/translate\([\'\"](.*)[\'\"].*?[\'\"](.*)[\'\"]\)$/U', $token->parameter['value'], $matches)) {
-                        // translation-string + context
-                        $tags[] = new TranslateTag($matches[1], [[TranslateTag::CONTEXT => $matches[2]]], $token->line);
-                    } elseif (preg_match('/translate\([\'\"](.*)[\'\"]/U', $token->parameter['value'], $matches)) {
-                        // Fallback: only the translation-string
-                        $tags[] = new TranslateTag($matches[1], [], $token->line);
+                    // point to local functions
+                    $data = [];
+                    $call = '$data=' . str_replace('$_smarty_tpl->tpl_vars[\'this\']->value->', '$this->pseudo_', $token->parameter['value']) . ';';
+                    //echo $call . "\n";
+                    try {
+                        eval($call);
+                    } catch (\Exception $e) {
+                        //file_put_contents('/Users/mac/Downloads/token.txt', print_r($call, true));
+                        //echo $e->getMessage();
+                    }
+                    //print_r($data);
+
+                    if (is_array($data)) {
+                        if (!empty($data['context'])) {
+                            $tags[] = new TranslateTag($data['string'], [[TranslateTag::CONTEXT => $data['context']]], $token->line);
+                        } else {
+                            $tags[] = new TranslateTag($data['string'], [], $token->line);
+                        }
                     }
                 }
             }
@@ -81,4 +93,85 @@ class TokenParser
 
         return $tags;
     }
+
+    private function pseudo_translate($string = null, $args = null, $alternativeLang = null, $context = null)
+    {
+        return [
+            'string'  => $string,
+            'context' => $context,
+        ];
+    }
+
+    // ignore-stuff
+    private function pseudo_staticUrl(
+        $arg0 = null,
+        $arg1 = null,
+        $arg2 = null,
+        $arg3 = null,
+        $arg4 = null,
+        $arg5 = null
+    ) {
+        return null;
+    }
+    private function pseudo_serverUrl(
+        $arg0 = null,
+        $arg1 = null,
+        $arg2 = null,
+        $arg3 = null,
+        $arg4 = null,
+        $arg5 = null
+    ) {
+        return null;
+    }
+    private function pseudo_hyphenator(
+        $arg0 = null,
+        $arg1 = null,
+        $arg2 = null,
+        $arg3 = null,
+        $arg4 = null,
+        $arg5 = null
+    ) {
+        return null;
+    }
+    private function pseudo_UrlViewHelper(
+        $arg0 = null,
+        $arg1 = null,
+        $arg2 = null,
+        $arg3 = null,
+        $arg4 = null,
+        $arg5 = null
+    ) {
+        return null;
+    }
+    private function pseudo_layout(
+        $arg0 = null,
+        $arg1 = null,
+        $arg2 = null,
+        $arg3 = null,
+        $arg4 = null,
+        $arg5 = null
+    ) {
+        return null;
+    }
+    private function pseudo_Logo(
+        $arg0 = null,
+        $arg1 = null,
+        $arg2 = null,
+        $arg3 = null,
+        $arg4 = null,
+        $arg5 = null
+    ) {
+        return null;
+    }
+    private function pseudo_MembershipStateYearsIcon(
+        $arg0 = null,
+        $arg1 = null,
+        $arg2 = null,
+        $arg3 = null,
+        $arg4 = null,
+        $arg5 = null
+    ) {
+        return null;
+    }
+
 }

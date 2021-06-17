@@ -91,6 +91,9 @@ EOT
             $output->writeln($potFile->getOutput());
         }
 
+        // FIXME: for testing
+        //file_put_contents('/tmp/klaus'. md5($outputFile) . '.pot', $potFile->getOutput());
+
         $output->writeln('<info>Done</info>');
 
         return 0;
